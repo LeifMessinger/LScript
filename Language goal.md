@@ -1,43 +1,24 @@
 The goal of L would be to piggy back off of english to make writing code and reading code easy.
 
-##First objective: Eliminate the dot operator
+## First objective: Eliminate the dot operator
 
-```
-person.name
-``` becomes ```
-person name		//Ik you're like, "Whaaaat? You can't do that!". Hold up, I'll explain
-```
+`person.name` becomes `person name` Ik you're like, "Whaaaat? You can't do that!". Hold up, I'll explain
 
-##Second objective: No more functions, only operators
+## Second objective: No more functions, only operators
 
-So ```
-str.equals(phrase)
-``` becomes ```
-str equals phrase
-```
+So `str.equals(phrase)` becomes `str equals phrase`
 
-Already this is a huge improvement.
+Already this is a huge improvement. Operator style readability is the main thing driving this language.
 
-It would probably be defined like ```
-const function equals String a, String b returns Boolean{
-	return a == b	//I know that isn't how you test if strings are equal, just an example
-}``` Either there's squiggly scopes or indentation scopes with or without the colon. A combination of indentation and squiggly brackets is the most readable.
-
-When I make L, I'll make sure to make it so that most characters can be in the operator identifier.
-
-I am thinking about changing the `function` keyword (like in javascript) to `operator`, but idk and it really doesn't matter.
-
-##Third objective: Parentheses no longer call functions
+## Third objective: Parentheses no longer call functions
 
 So that makes parentheses mean what they literally mean in math: "Do this first".
 
-Parentheses would be used solely to reorder precedence, because ```
-str equals person name``` would mean `str.equals(person).name`, when you really meant ```
-str equals (person name)``` which is `str.equals(person.name)`
+Parentheses would be used solely to reorder precedence, because `str equals person name` would mean `str.equals(person).name`, when you really meant`str equals (person name)` which is `str.equals(person.name)`
 
 You'd think that because I have to explain it in code it's more complicated, but if you go back over it without looking at the code, it makes sense.
 
-##Fourth objective: Wherever you'd use a semicolon, you can use a period
+## Fourth objective: Wherever you'd use a semicolon, you can use a period
 
 Yes, I'm bringing back the dots.
 
@@ -45,27 +26,32 @@ Just like how sentences end with periods, your lines of code could end with peri
 
 Note that I'm leaving the option to use semicolons. Sometimes it's gramatically correct to use a semicolon in some cases, especially if you want to put 2 statements on one line, like in for loops.
 
-##Fifth objective and arguably the most complicated: No more assignment operator.
+## Fifth objective and arguably the most complicated: No more assignment operator.
 
-So ```java
-String bruh = "";```becomes```
+So
+```java
+String bruh = "";
+```
+becomes
+```
 String bruh "".
-```or probably more commonly,```
+```
+or probably more commonly,
+```
 String bruh ("").	//Almost looks like c++, yeah?
 ```
 
-That's because later on, you might want to set a variable to something, so you would use ```
+That's because later on, you might want to set a variable to something, so you would use
+```
 bruh (person name + " the third").
 ```
 
 If you have two variables next to each other, then the left one gets set to the one on the right.
 
-##Sixth and objectively easier than the last thing: Allow for the type to be removed if it is set to a typed value.
+## Sixth and objectively easier than the last thing: Allow for the type to be removed if it is set to a typed value.
 
-So ```
-String bruh "".```becomes```
-bruh ""
-```
+So `String bruh ""` becomes `bruh ""`
+
 It makes it a lot harder to read, but some people don't like to think about types and footgun themselves. Good practice always has the type, but without it is the same as `auto`.
 
 #How would all of this work? Wouldn't that be a compiler nightmare?
@@ -110,3 +96,5 @@ A bit of an internal thing, but
 
 If a typename is next to a comma, make a tuple of typenames.
 If a variable/operator is next to a comma, make a tuple of variables/operators.
+
+Because of the whole auto thing and how I am doing functions initially (and quite ingeniously), I might not need function types which could save a lot of time coding.
