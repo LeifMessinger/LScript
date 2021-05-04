@@ -4,19 +4,25 @@ The goal of L would be to piggy back off of english to make writing code and rea
 
 `person.name` becomes `person name` Ik you're like, "Whaaaat? You can't do that!". Hold up, I'll explain
 
-## Second objective: No more functions, only operators
+## Second objective: No more functions, only template sentence definitions
+
+`function multiply(int a, int b){return a*b}` becomes `define multiply $1 * $2`
+
+So, no more functions. That doesn't mean it's the same as a preprocessor define. Every time the sentence identifier is seen, it just replaces the identifier with the definition, then it replaces single character words with their respective argument. Theoretically this also enables you to pass sentences into other sentences without too much hassle. If you wanted to make a recursive function, you could do `define recursion recursion`(If I wanted to make a real recursive statement, I would need control flow which I haven't thought about yet).
+
+## Third objective: Functions get called like operators
 
 So `str.equals(phrase)` becomes `str equals phrase`
 
 Already this is a huge improvement. Operator style readability is the main thing driving this language.
 
-## Third objective: Parentheses no longer call functions
+### Third objective part 2: Parentheses no longer call functions
 
 So that makes parentheses mean what they literally mean in math: "Do this first".
 
 Parentheses would be used solely to reorder precedence, because `str equals person name` would mean `str.equals(person).name`, when you really meant`str equals (person name)` which is `str.equals(person.name)`
 
-You'd think that because I have to explain it in code it's more complicated, but if you go back over it without looking at the code, it makes sense.
+You'd think that because I have to explain it in code it's more complicated, but if you go back over it without looking at the code, it makes sense. I don't have to get into how this functionless language works off of functional progamming theory and monads(which these things aren't really, but that still kind of furthers my point) or any other theory gargon to try to explain it. I can just show that the syntax works and let it speak for itself.
 
 ## Fourth objective: Wherever you'd use a semicolon, you can use a period
 
