@@ -18,15 +18,20 @@ namespace L{
 	};
 	class Instance{
 		private:
-			//init()
+			void init();
 		public:
-			Instance();
-			//Instance(std::istream&); Just call init, then call readFrom
+			//Variables
 			Dictionary dic;	//Gets cleared and deleted when dic gets destroyed. Holy cow, that sounds wrong
 			Sentence sentence;
 			size_t index = 0;
-			
-			//readFrom(std::istream);	Do this later, I'm tired
+
+			//Constructors
+			Instance();
+			Instance(std::istream&);
+
+			//Methods
+			void stdInit();	//Makes words like "print" and "quit"
+			void readFrom(std::istream&);
 			void pushWord(std::string word); 	//Pushes a single word onto the stack
 			//In theory, the entire program should be able to run off this one function
 	};
