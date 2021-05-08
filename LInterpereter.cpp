@@ -28,7 +28,7 @@ class PrintWord : public L::Word{
 //Next we define quit
 class QuitWord : public L::Word{
         virtual Word* evaluate(L::Instance& instance){
-                std::cout << "QUIT";	//Find a way to break from the program
+                std::cout << "PRINT";	//Find a way to break from the program
                 return nullptr;
         }
 };
@@ -65,8 +65,14 @@ void L::Instance::pushWord(std::string word){
 	wordStack.push_back(word);
 }
 void L::Instance::evaluate(){
-	for(L::Sentence::const_iterator it = wordStack.cbegin(); it != wordStack.cend(); it++){
+	/*for(L::Sentence::const_iterator it = wordStack.cbegin(); it != wordStack.cend(); it++){
 		std::cout << (*it) << " ";
+	}*/	//Print stack
+	for(L::Sentence::const_iterator it = wordStack.cbegin(); it != wordStack.cend(); it++){
+		std::map<std::string, L::Word*>::iterator result = dic.find(*it);
+		if(result != dic.end()){
+			result->second->evaluate(*this);
+		}
 	}
 	std::cout << std::endl;
 	wordStack.clear();
