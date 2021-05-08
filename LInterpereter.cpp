@@ -69,7 +69,7 @@ void L::Instance::evaluate(){
 		std::cout << (*it) << " ";
 	}*/	//Print stack
 	for(size_t i = 0; i < wordStack.size(); i++){
-		std::map<std::string, L::Word*>::iterator word = dic.find(wordStack[it]);
+		std::map<std::string, L::Word*>::iterator word = dic.find(wordStack[i]);
 		Word* result;
 		if(word != dic.end()){
 			result = word->second->evaluate(*this);
