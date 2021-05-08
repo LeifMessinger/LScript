@@ -68,10 +68,15 @@ void L::Instance::evaluate(){
 	/*for(L::Sentence::const_iterator it = wordStack.cbegin(); it != wordStack.cend(); it++){
 		std::cout << (*it) << " ";
 	}*/	//Print stack
-	for(L::Sentence::const_iterator it = wordStack.cbegin(); it != wordStack.cend(); it++){
-		std::map<std::string, L::Word*>::iterator result = dic.find(*it);
-		if(result != dic.end()){
-			result->second->evaluate(*this);
+	for(size_t i = 0; i < wordStack.size(); i++){
+		std::map<std::string, L::Word*>::iterator word = dic.find(wordStack[it]);
+		Word* result;
+		if(word != dic.end()){
+			result = word->second->evaluate(*this);
+		}
+		if(result != nullptr){
+			//The word did something and has returned a value
+			//I have to consider not literally returning a word after my evaluate function
 		}
 	}
 	std::cout << std::endl;
