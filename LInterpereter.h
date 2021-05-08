@@ -8,7 +8,7 @@ namespace L{
 	class Instance;
 	class Word{
 		public:
-			virtual Word* evaluate(Instance& instance);
+			virtual void evaluate(Instance& instance);
 			virtual ~Word(){}	//Virtual classes should have virtual destructors
 	};
 	class Dictionary : public std::map<std::string,Word*>{
@@ -33,7 +33,7 @@ namespace L{
 			void stdInit();	//Makes words like "print" and "quit"
 			void readFrom(std::istream&);
 			void pushWord(std::string word); 	//Pushes a single word onto the stack
-			void evaluate();	//I should probably change the name of this function
+			static void evaluate(Instance&);	//I should probably change the name of this function
 			//In theory, the entire program should be able to run off this one function
 	};
 }

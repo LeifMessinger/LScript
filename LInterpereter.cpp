@@ -1,12 +1,10 @@
 #include<iostream>
 #include"LInterpereter.h"	//Should include vector and map
 #include<regex>
-L::Word* L::Word::evaluate(Instance& instance){	//I said it would be elegent, I didn't say it would be fast or efficient.
+void L::Word::evaluate(Instance& instance){	//I said it would be elegent, I didn't say it would be fast or efficient.
 	//We make sentence a reference because we want to be able to do stuff to it
 	//Index is the index of the current word, so if it was at the start it would be 0
-	
-	//Can return nullptr, and can return an actual word function/variable/namespace that needs to be deleted
-	return nullptr;
+	return;
 }
 L::Dictionary::~Dictionary(){
 	if(!deleteAfterwards) return;
@@ -20,16 +18,17 @@ void L::Instance::init(){
 //STD Definitions
 //First we define print
 class PrintWord : public L::Word{
-        virtual Word* evaluate(L::Instance& instance){
-                std::cout << "QUIT";
-                return nullptr;
+        virtual void evaluate(L::Instance& instance){
+                for(size_t i = 1; i < instance.wordStack.size(); i++){
+			std::cout << (instance.wordStack[i]) << " ";
+		}	//Print stack
+		instance.wordStack.clear();
         }
 };
 //Next we define quit
 class QuitWord : public L::Word{
-        virtual Word* evaluate(L::Instance& instance){
-                std::cout << "PRINT";	//Find a way to break from the program
-                return nullptr;
+        virtual void evaluate(L::Instance& instance){
+                std::cout << "QUIT";	//Find a way to break from the program
         }
 };
 
@@ -58,27 +57,22 @@ void L::Instance::readFrom(std::istream& st){
                         line = matcher.suffix().str();  //Apparently this is how you keep searching through a string
                 }
 		//std::cout << "Evaluating:" << std::endl;
-		this->evaluate();
+		this->evaluate(*this);
         }
 }
 void L::Instance::pushWord(std::string word){
 	wordStack.push_back(word);
 }
-void L::Instance::evaluate(){
+void L::Instance::evaluate(Instance& instance){	//Not really recursive
 	/*for(L::Sentence::const_iterator it = wordStack.cbegin(); it != wordStack.cend(); it++){
 		std::cout << (*it) << " ";
 	}*/	//Print stack
-	for(size_t i = 0; i < wordStack.size(); i++){
-		std::map<std::string, L::Word*>::iterator word = dic.find(wordStack[i]);
-		Word* result;
-		if(word != dic.end()){
-			result = word->second->evaluate(*this);
-		}
-		if(result != nullptr){
-			//The word did something and has returned a value
-			//I have to consider not literally returning a word after my evaluate function
+	for(size_t i = 0; i < instance.wordStack.size(); i++){
+		std::map<std::string, L::Word*>::iterator word = instance.dic.find(instance.wordStack[i]);
+		if(word != instance.dic.end()){
+			word->second->evaluate(instance);
 		}
 	}
 	std::cout << std::endl;
-	wordStack.clear();
+	instance.wordStack.clear();
 }
