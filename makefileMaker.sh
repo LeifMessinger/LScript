@@ -1,3 +1,4 @@
+#!/bin/bash
 #makefileMaker.sh by Leif Messinger
 #Needs getDependencies.sh
 echo -n "output:"
