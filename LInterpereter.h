@@ -22,7 +22,7 @@ namespace L{
 		public:
 			//Variables
 			Dictionary dic;	//Gets cleared and deleted when dic gets destroyed. Holy cow, that sounds wrong
-			Sentence sentence;
+			Sentence wordStack;
 			size_t index = 0;
 
 			//Constructors
@@ -33,6 +33,7 @@ namespace L{
 			void stdInit();	//Makes words like "print" and "quit"
 			void readFrom(std::istream&);
 			void pushWord(std::string word); 	//Pushes a single word onto the stack
+			void evaluate();	//I should probably change the name of this function
 			//In theory, the entire program should be able to run off this one function
 	};
 }

@@ -52,14 +52,22 @@ void L::Instance::readFrom(std::istream& st){
                 //Todo: split lines by either periods or semicolons
                 std::smatch matcher;
                 while(std::regex_search(line,matcher,wordGetter)){      //for each word token
-                        for(std::string word : matcher){
-                                this->pushWord(word);
+                        for(std::string capturingGroup : matcher){ //This thing loops through each capturing group
+                                this->pushWord(capturingGroup);
                         }
-			std::cout << std::endl;
                         line = matcher.suffix().str();  //Apparently this is how you keep searching through a string
                 }
+		//std::cout << "Evaluating:" << std::endl;
+		this->evaluate();
         }
 }
 void L::Instance::pushWord(std::string word){
-	std::cout << word << " ";
+	wordStack.push_back(word);
+}
+void L::Instance::evaluate(){
+	for(L::Sentence::const_iterator it = wordStack.cbegin(); it != wordStack.cend(); it++){
+		std::cout << (*it) << " ";
+	}
+	std::cout << std::endl;
+	wordStack.clear();
 }
