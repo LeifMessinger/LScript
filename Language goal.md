@@ -60,47 +60,123 @@ So `String bruh ""` becomes `bruh ""`
 
 It makes it a lot harder to read, but some people don't like to think about types and footgun themselves. Good practice always has the type, but without it is the same as `auto`.
 
-#How would all of this work? Wouldn't that be a compiler nightmare?
+# How would all of this work? Wouldn't that be a compiler nightmare?
 
-Yes, and yet it's possible. It would be easier to start it off as some sort of BrainF*ck style scripting language, so not too ambitious, and then later think of a way to make a compiler.
+Yes, and yet it's possible. It would be easier to start it off as some sort of BrainF\*ck style scripting language, so not too ambitious, and then later think of a way to make a compiler.
 
-In all likelyhood, this thing is going to compile into c (or c--) and then that compiles into assembly, so it will take twice as long to compile, but that doesn't matter.
+I couldn't wrap my head around how this would work, mainly because I was thinking of having a single stack with some sort of object inheritance.
 
-Words can only really be four things:
-	1. Type names/Name spaces
-	2. Variables
-	3. Operators
-	4. Not assigned yet
+In CS they talk about prefix and postfix (aka polish and reverse polish) and infix. Prefix looks like `* - 5 6 7`, postfix looks like `7 5 6 - *` and infix looks like `(5-6)*7`. 
 
-Typename rules		//Be aware, when I say "next to" I mean to the left of.
+The reason why reverse polish notation (postfix) is useful is because you can use a single stack for your variables as long as your operators have everything they need before they are called. If you see a number, just push it onto the stack, and if you see an operator, pull the nessesary amount of variables off of the stack. This makes RPN (postfix) the easiest notation to code.
 
-If a typename is next to a typename, crash.
-If a typename is next to some variables, it constructs a variable from those variables.
-If a typename is next to an operator, check if it is in the typename namespace. Find the definition, and treat the whole thing as an operator.
-If a typename is next to something that isn't assigned yet, create a variable with that word as its identifier.
+So how would prefix be solved? It's a bit harder because the operators need to wait for the right amount of operands before they go away. Easiest thing to do is to just convert to postfix by flipping the order around. So `* - 5 6 7` becomes `7 6 5 - *`. That still isn't right because the minus isn't commutative, so you just need to define the minus operator with the operands reversed. That is just a hackish way of doing it which can't live eval because it has to wait until the entire line is typed for it to be reversed, then it can start evaluating. Live eval for an infix language is impossible because you would need an engine to do both postfix and prefix.
 
-Variable rules
+If you wanted to have a live eval for prefix, your operators would be held on the stack and your variables would be held in a queue. However, the weird bit is that when a operator has what it needs, it grabs those variables and replaces it with the return, placing the return variable at the front of the queue, breaking the queue.
 
-If a variable is next to a typename, crash.
-If a variable is next to a variable, check to make sure that the thing on the right is the same type, then set the variable to the value of the thing on the right.
-If a variable is next to an operator, check to see if the operator is in the namespace of the variable, or if it's global. Else, crash.
-If a variable is next to something that isn't assigned yet, crash.
+The way javascript implements queues is with an array. Arrays have `push` and `pop` methods that implement the functionality of a stack. Push puts things on the top and pop pops off the top of the queue. The method they use to get data off the bottom is called `shift` aka dequeue or remove. So stacks use push and pop and queues use push and shift. If you want to push something to the front of the queue, you use the function `unshift` which takes an element. It basically does the opposite of what `shift` aka dequeue or remove does. So we need something like that.
 
-Operators rules
+Singly linked lists give the functionality of a stack, but for a queue, they need to know where the front of the queue is to remove stuff and the back of the queue to add stuff. Otherwise you have to find the front every time you remove something and find the back every time you add something, which does a loop through all the elements every single time(for one of those at least). Using a doubly linked list solves that, but at the same time those are a pain and take up more space than I'd like.
 
-If an operator is next to a typename, crash.
-If an operator is next to a variable, check to make sure that the thing on the right matches the operator signature, then do whatever operators do.
-If an operator is next to an operator, check to see that the operator has an operator in the signature, then do whatever operators do.
-If an operator is next to something that isn't assigned yet, crash.
+So in summary, my entire language problem can be summed down into making a doubly linked list, which isn't hard but just tedious.
 
-Not assigned yet rules
+But after I do that, basically I got a stack for my operators, and a doubly linked queue with an unshift for the operands. After I do that, I basically feed the operands into the operator on the top and it's done. Here's what would happen if I ran that sample prefix problem with my live eval prefix solver.
 
-If the thing to the right evaluates to a value, copy the type of that value and the value and make a new variable.
-Else, Either crash, or skip it as a sort of comment or grammar word.
+```
+* - 5 6 7
+Operator stack and variable queue:
+1. '*'	["*"]				[] 
+	"*" doesn't have what it needs
 
-A bit of an internal thing, but
+2. '-'	["*","-"]			[]
+	"-" doesn't have what it needs
 
-If a typename is next to a comma, make a tuple of typenames.
-If a variable/operator is next to a comma, make a tuple of variables/operators.
+3. '5'	["*","-"]			[5]
+	"-" doesn't have what it needs
 
-Because of the whole auto thing and how I am doing functions initially (and quite ingeniously), I might not need function types which could save a lot of time coding.
+4. '6'	["*","-"]			[5,6]
+	"-" has what it needs, the 5 and the 6
+	It takes those off the queue and uses operates
+	It returns a number that gets unshifted back onto the stack
+	["*"]			[-1]
+	
+5. '7'	["*"]			[-1,7]
+	"*" has what it needs, a -1 and a 7
+	It takes those off the queue and uses operates
+	It returns a number that gets unshifted back onto the stack
+	[]			[-7]
+```
+
+But here's the kicker, let's try running the postfix problem on my prefix solver.
+
+```
+7 5 6 - *
+Operator stack and variable queue:
+1. '7'	[]				[7] 
+	There are no operators to operate with
+
+2. '5'	[]			[7,5]
+	There are no operators to operate with
+
+3. '6'	[]			[7,5,6]
+	There are no operators to operate with
+
+4. '-'	["-"]			[7,5,6]
+	"-" has what it needs, the 7 and the 5
+```
+
+Well darn, I really thought that was going to work. How about, if an operator is pushed to the stack and it has everything it needs, it pops the variables off of our ugly queue-stack. (I don't really do this in the program, just trying to prove a terrible point)
+
+```
+7 5 6 - *
+Operator stack and variable queue:
+1. '7'	[]				[7] 
+	There are no operators to operate with
+
+2. '5'	[]			[7,5]
+	There are no operators to operate with
+
+3. '6'	[]			[7,5,6]
+	There are no operators to operate with
+
+4. '-'	["-"]			[7,5,6]
+	"-" has what it needs, the 5 and the 6
+	It takes those off the queue and uses operates
+	It returns a number that gets unshifted back onto the stack
+	[]			[-1]
+	
+5. '7'	["*"]			[-1,7]
+	"*" has what it needs, a -1 and a 7
+	It takes those off the queue and uses operates
+	It returns a number that gets unshifted back onto the stack
+	[]			[-7]
+```
+
+Anyways, the reason I'm hammering on this is because I said that if there was an engine that could solve both prefix and postfix, infix would possible. My language is trying to have infix operators all over the place, so let's try it out on the solver.
+
+```
+5 - 6 * 7	//Screw your order of operations, use parentheses if you don't want this
+Operator stack and variable queue:
+1. '5'	[]				[5] 
+	There are no operators to operate with
+
+2. '-'	["-"]			[5]
+	"-" doesn't have what it needs
+
+3. '6'	["-"]			[5,6]
+	"-" has what it needs, the 5 and the 6
+	It takes those off the queue and uses operates
+	It returns a number that gets unshifted back onto the stack
+	[]			[-1]
+
+4. '*'	["*"]			[-1]
+	"*" doesn't have what it needs
+	
+5. '7'	["*"]			[-1,7]
+	"*" has what it needs, a -1 and a 7
+	It takes those off the queue and uses operates
+	It returns a number that gets unshifted back onto the stack
+	[]			[-7]
+```
+
+Luckily for me, infix doesn't have more than 1 variable behind an operator, so I don't need to do that weird thing with the postfix. I don't even know how doing that reverse thing with 3 variables would work, let alone 2 behind the operator and 1 in front. If it comes down to it, I can just store the index of the words when they are pushed so when an operator needs to order them it can reorder them in relation to its own index. I'm probably going to start a second repo for this, actually do this in js, then go back to c and do it with words. That way I'll know exacly how that popping of the front of the queue thing would work.
