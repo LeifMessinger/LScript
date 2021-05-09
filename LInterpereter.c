@@ -29,9 +29,13 @@
 //Or it can get pushed into the next word loop as is.
 
 //Todo: Make a basic fgetc loop
-#include <stdio.h>
+#include <stdio.h>	//FILE, fgetc, fputc, printf, scanf, stdin, stdout, stderr
+#include <stdlib.h> 	//calloc
 void L_evalIO(FILE* input, FILE* output){
-	for(int c = fgetc(input); c != EOF; c = fgetc(input)){
-		fputc(c,output);
+	char* buffer = calloc(sizeof(char),2047);	//Reserve a bunch of space
+	//Calloc makes it so I don't have to put that null character on the end
+	for(int c = fgetc(input), i = 0; c != EOF; c = fgetc(input), ++i){	//First loop buffers characters into a string
+		buffer[i] = (char)c;
 	}
+	printf("%s",buffer);
 }
