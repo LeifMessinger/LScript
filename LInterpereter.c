@@ -29,7 +29,9 @@
 //Or it can get pushed into the next word loop as is.
 
 //Todo: Make a basic fgetc loop
-
-void L_charLoop(FILE* file){
-	//fgetc();	Man I'm way too tired for this
+#include <stdio.h>
+void L_evalIO(FILE* input, FILE* output){
+	for(int c = fgetc(input); c != EOF; c = fgetc(input)){
+		fputc(c,output);
+	}
 }
