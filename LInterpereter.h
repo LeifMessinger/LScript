@@ -1,17 +1,24 @@
 #include<iostream>
 #include<vector>
+#include<stack>
+#include<queue>
 #include<map>
 namespace L{
-	typedef std::vector<std::string> Sentence;	//Used by the compiler, but also a common phrase I use to describe procedures
-	class Word;	//Forward declarations
+	//enum VariableType {UNDEFINED, STRING, INT, FLOAT, STRUCT, OPERATOR};	I'm doing the unique coding style, "We'll cross that bridge when we come to it"
+	class Operator;	//Forward declarations
 	class Dictionary;
 	class Instance;
-	class Word{
+	class Operator{
 		public:
 			virtual void evaluate(Instance& instance);
-			virtual ~Word(){}	//Virtual classes should have virtual destructors
+			virtual ~Operator(){}	//Virtual classes should have virtual destructors
 	};
-	class Dictionary : public std::map<std::string,Word*>{
+	class Variable : public Operator{
+		public:
+			std::string data;
+			void evaluate(Instance& instance) override;
+	};
+	class Dictionary : public std::map<std::string,Operator*>{	//Stores definitions
 		public:
 			bool deleteAfterwards = false;
 			~Dictionary();
@@ -22,17 +29,19 @@ namespace L{
 		public:
 			//Variables
 			Dictionary dic;	//Gets cleared and deleted when dic gets destroyed. Holy cow, that sounds wrong
-			Sentence wordStack;
+			std::stack<std::Operator> operatorStack;
+			std::queue<std::Operator> variableQueue;
 			size_t index = 0;
 
 			//Constructors
 			Instance();
-			Instance(std::istream&);
+			Instance(std::string);		//Instantly starts crunching from string
+			Instance(std::istream&);	//Instantly starts crunching from input stream
 
 			//Methods
 			void stdInit();	//Makes words like "print" and "quit"
 			void readFrom(std::istream&);
-			void pushWord(std::string word); 	//Pushes a single word onto the stack
+			void pushWord(std::string word);	//Pushes a single word onto the stack
 			static void evaluate(Instance&);	//I should probably change the name of this function
 			//In theory, the entire program should be able to run off this one function
 	};
